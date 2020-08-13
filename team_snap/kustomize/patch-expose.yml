@@ -1,0 +1,20 @@
+apiVersion: spinnaker.armory.io/v1alpha2
+kind: SpinnakerService
+metadata:
+  name: spinnaker
+spec:
+  expose:
+    type: ingress
+    service:
+      annotations: {}
+      overrides: {}
+      #type: LoadBalancer
+      #annotations:
+      #  cloud.google.com/load-balancer-type: "Internal"
+      #overrides:
+      #  gate:
+      #    loadBalancerIP: 172.27.0.96
+      #    ports:
+      #      - port: 8080
+      #        protocol: TCP
+      #        targetPort: 8084

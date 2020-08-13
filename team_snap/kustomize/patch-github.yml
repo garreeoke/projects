@@ -1,0 +1,21 @@
+apiVersion: spinnaker.armory.io/v1alpha2
+kind: SpinnakerService
+metadata:
+  name: spinnaker
+spec:
+  spinnakerConfig:
+    config:
+      artifacts:
+        github:
+          enabled: true
+          accounts:
+          - name: poc-github
+            token: encrypted:k8s!n:ts-poc-secrets!k:poc-spinnaker-github-token
+    profiles:
+      clouddriver:
+        artifacts:
+          gitRepo:
+            enabled: true
+            accounts:
+            - name: gitrepo
+              token: encrypted:k8s!n:ts-poc-secrets!k:poc-spinnaker-github-token

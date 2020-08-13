@@ -1,0 +1,17 @@
+apiVersion: spinnaker.armory.io/v1alpha2
+kind: SpinnakerService
+metadata:
+  name: spinnaker
+spec:
+  spinnakerConfig:
+    config:
+      security:
+        apiSecurity:
+          ssl:
+            enabled: false
+          overrideBaseUrl: http://poc-spinnaker-api.teamsnap.io:8080
+          #corsAccessPattern: http://poc-spinnaker.teamsnap.io
+        uiSecurity:
+          ssl:
+            enabled: false
+          overrideBaseUrl: http://poc-spinnaker.teamsnap.io

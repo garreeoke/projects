@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spin-cli
+  namespace: spinnaker
+spec:
+  selector:
+    matchLabels:
+      app: spin-cli
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: spin-cli
+    spec:
+      containers:
+        - name: spin-cli
+          image: garreeoke/spin-cli:1.0
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+          - name: spin-cli-cfg
+            mountPath: /root/.spin
+      volumes:
+        - name: spin-cli-cfg
+          secret:
+            secretName: spin-cli-config

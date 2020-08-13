@@ -1,0 +1,487 @@
+{
+  "description": "Deploy Platform Health Application",
+  "keepWaitingPipelines": true,
+  "lastModifiedBy": "apearsall",
+  "limitConcurrent": true,
+  "notifications": [
+    {
+      "address": "#platform",
+      "level": "pipeline",
+      "type": "slack",
+      "when": [
+        "pipeline.complete",
+        "pipeline.failed"
+      ]
+    }
+  ],
+  "parameterConfig": [
+    {
+      "default": "master",
+      "description": "Branch name to deploy",
+      "hasOptions": false,
+      "label": "Name of GitHub branch",
+      "name": "Branch Name",
+      "options": [
+        {
+          "value": ""
+        }
+      ],
+      "pinned": true,
+      "required": true
+    },
+    {
+      "default": "true",
+      "description": "Do we build images as part of this deployment",
+      "hasOptions": true,
+      "label": "Build docker images",
+      "name": "Build Images",
+      "options": [
+        {
+          "value": "false"
+        }
+      ],
+      "pinned": false,
+      "required": true
+    }
+  ],
+  "spelEvaluator": "v4",
+  "stages": [
+    {
+      "customHeaders": {
+        "Content-type": "application/json"
+      },
+      "expectedArtifacts": [
+        {
+          "defaultArtifact": {
+            "customKind": true,
+            "id": "897a6f14-109f-409c-a60d-61242610150e"
+          },
+          "displayName": "Master Helm Chart",
+          "id": "201c1d18-81fc-455a-a788-78676cb5c745",
+          "matchArtifact": {
+            "artifactAccount": "poc-gcs-service-account",
+            "id": "f6f21d6d-021a-4970-a0a7-08ba7ad07682",
+            "name": "helm-chart",
+            "type": "gcs/object"
+          },
+          "useDefaultArtifact": false,
+          "usePriorArtifact": false
+        },
+        {
+          "defaultArtifact": {
+            "artifactAccount": "poc-github",
+            "id": "2816dcc7-d79b-4412-a389-6b349ef8ca35",
+            "name": "infra/helm/values/poc-values.yaml",
+            "reference": "https://api.github.com/repos/teamsnap/platform-health/contents/infra/helm/values/poc-values.yaml",
+            "type": "github/file",
+            "version": "master"
+          },
+          "displayName": "Master Helm Values",
+          "id": "14b15790-577d-402e-8908-28c401657f96",
+          "matchArtifact": {
+            "artifactAccount": "poc-github",
+            "id": "3c5ace17-55c2-44ff-b58a-92e537eaffb9",
+            "name": "infra/helm/values/poc-values.yaml",
+            "type": "github/file"
+          },
+          "useDefaultArtifact": true,
+          "usePriorArtifact": false
+        }
+      ],
+      "method": "GET",
+      "name": "GitHub Master Request",
+      "refId": "1",
+      "requisiteStageRefIds": [],
+      "stageEnabled": {
+        "expression": "${ parameters[\"Branch Name\"] != 'master' }",
+        "type": "expression"
+      },
+      "statusUrlResolution": "getMethod",
+      "type": "webhook",
+      "url": "http://pipeline-commander-service.pipeline-commander.svc.cluster.local/github/master_sha/repo/platform-health",
+      "waitForCompletion": false
+    },
+    {
+      "customHeaders": {
+        "Content-type": "application/json"
+      },
+      "expectedArtifacts": [
+        {
+          "defaultArtifact": {
+            "customKind": true,
+            "id": "d30b8e08-2033-4f01-a35d-952bfbc91a4f"
+          },
+          "displayName": "Branch Helm Chart",
+          "id": "12bca5a4-683e-448f-9f6a-561f6cd265ed",
+          "matchArtifact": {
+            "artifactAccount": "poc-gcs-service-account",
+            "id": "1aa9949d-88bc-4768-87a2-2e8947fb3641",
+            "name": "helm-chart",
+            "type": "gcs/object"
+          },
+          "useDefaultArtifact": false,
+          "usePriorArtifact": false
+        },
+        {
+          "defaultArtifact": {
+            "artifactAccount": "poc-github",
+            "id": "fd90c2d0-a626-4c4c-b23e-fcd87f635af2",
+            "name": "infra/helm/values/poc-values.yaml",
+            "reference": "https://api.github.com/repos/teamsnap/platform-health/contents/infra/helm/values/poc-values.yaml",
+            "type": "github/file",
+            "version": "master"
+          },
+          "displayName": "Branch Helm Values",
+          "id": "3d3073f7-4a9b-445f-810b-109e1831ca76",
+          "matchArtifact": {
+            "artifactAccount": "poc-github",
+            "id": "c4a47168-cc5d-4e2f-8796-13606425552b",
+            "name": "infra/helm/values/poc-values.yaml",
+            "type": "github/file"
+          },
+          "useDefaultArtifact": true,
+          "usePriorArtifact": false
+        }
+      ],
+      "method": "POST",
+      "name": "GitHub Request",
+      "payload": {
+        "branch_name": "${ parameters['Branch Name'] }",
+        "repo_name": "platform-health"
+      },
+      "refId": "2",
+      "requisiteStageRefIds": [],
+      "stageEnabled": {
+        "expression": "${ parameters[\"Branch Name\"] != 'master' }",
+        "type": "expression"
+      },
+      "statusUrlResolution": "getMethod",
+      "type": "webhook",
+      "url": "http://pipeline-commander-service.pipeline-commander.svc.cluster.local/github/preflight_check_pr"
+    },
+    {
+      "canceledStatuses": "CANCELLED",
+      "customHeaders": {
+        "Content-type": "application/json"
+      },
+      "method": "POST",
+      "name": "Build Master Image",
+      "payload": {
+        "commit_sha": "${ #stage('GitHub Master Request')['context']['webhook']['body']['commit_sha'] }",
+        "repo_name": "platform-health",
+        "type": "docker_image"
+      },
+      "refId": "3",
+      "requisiteStageRefIds": [
+        "1"
+      ],
+      "stageEnabled": {
+        "expression": "${ parameters['Branch Name'] == 'master' && parameters['Build Images'] == true }",
+        "type": "expression"
+      },
+      "statusJsonPath": "$.status",
+      "statusUrlJsonPath": "$.status_url",
+      "statusUrlResolution": "webhookResponse",
+      "successStatuses": "SUCCESS",
+      "terminalStatuses": "FAILURE,ERROR",
+      "type": "webhook",
+      "url": "http://pipeline-commander-service.pipeline-commander.svc.cluster.local/google_builds",
+      "waitBeforeMonitor": "",
+      "waitForCompletion": true
+    },
+    {
+      "name": "Preflight Checklist",
+      "preconditions": [
+        {
+          "context": {
+            "expression": "${ #stage('GitHub Request')['context']['webhook']['body']['mergeable_state'] == 'clean' }",
+            "failureMessage": "GitHub PR is not in a mergeable state!\n- Have all CI checks completed successfully? \n- Is the branch up to date with master?"
+          },
+          "failPipeline": true,
+          "type": "expression"
+        },
+        {
+          "context": {
+            "expression": "${ #stage('GitHub Request')['context']['webhook']['body']['merged'] == false }",
+            "failureMessage": "GitHub branch has already been merged!"
+          },
+          "failPipeline": true,
+          "type": "expression"
+        }
+      ],
+      "refId": "4",
+      "requisiteStageRefIds": [
+        "2"
+      ],
+      "stageEnabled": {
+        "expression": "${ parameters['Branch Name'] != 'master' }",
+        "type": "expression"
+      },
+      "type": "checkPreconditions"
+    },
+    {
+      "expectedArtifacts": [
+        {
+          "defaultArtifact": {
+            "customKind": true,
+            "id": "fb600536-64c6-4636-bab8-616143ff72bb"
+          },
+          "displayName": "Master Kubernetes Manifests",
+          "id": "88a0995c-10f0-4560-b8ab-53df45b1e394",
+          "matchArtifact": {
+            "artifactAccount": "embedded-artifact",
+            "customKind": false,
+            "id": "30e93163-786a-45c0-a1ef-0c3313285021",
+            "name": "platform-health",
+            "type": "embedded/base64"
+          },
+          "useDefaultArtifact": false,
+          "usePriorArtifact": false
+        }
+      ],
+      "inputArtifacts": [
+        {
+          "account": "",
+          "id": "201c1d18-81fc-455a-a788-78676cb5c745"
+        },
+        {
+          "account": "",
+          "id": "14b15790-577d-402e-8908-28c401657f96"
+        }
+      ],
+      "name": "Create Master Kube Manifests",
+      "namespace": "platform-health",
+      "outputName": "platform-health",
+      "overrides": {
+        "deployType": "normal",
+        "imageTag": "githubMasterRequestTag"
+      },
+      "rawOverrides": false,
+      "refId": "5",
+      "requisiteStageRefIds": [
+        "3"
+      ],
+      "stageEnabled": {
+        "expression": "${ parameters['Branch Name'] == 'master' }",
+        "type": "expression"
+      },
+      "templateRenderer": "HELM2",
+      "type": "bakeManifest"
+    },
+    {
+      "canceledStatuses": "CANCELLED",
+      "customHeaders": {
+        "Content-type": "application/json"
+      },
+      "method": "POST",
+      "name": "Build Helm Chart",
+      "payload": {
+        "commit_sha": "${ #stage('GitHub Request')['context']['webhook']['body']['commit_sha'] }",
+        "repo_name": "platform-health",
+        "type": "helm_chart"
+      },
+      "refId": "6",
+      "requisiteStageRefIds": [
+        "4"
+      ],
+      "stageEnabled": {
+        "expression": "${ parameters['Branch Name'] != 'master' && #stage('GitHub Request')['context']['webhook']['body']['helm_chart_version_incremented'] == true }",
+        "type": "expression"
+      },
+      "statusJsonPath": "$.status",
+      "statusUrlJsonPath": "$.status_url",
+      "statusUrlResolution": "webhookResponse",
+      "successStatuses": "SUCCESS",
+      "terminalStatuses": "FAILURE,ERROR",
+      "type": "webhook",
+      "url": "http://pipeline-commander-service.pipeline-commander.svc.cluster.local/google_builds",
+      "waitForCompletion": true
+    },
+    {
+      "expectedArtifacts": [
+        {
+          "defaultArtifact": {
+            "customKind": true,
+            "id": "0f964c55-043c-4b2e-9d99-9fc77bbcd7b7"
+          },
+          "displayName": "Branch Kubernetes Manifests",
+          "id": "38709b41-0ce9-4f98-a913-a2eeb32c20ac",
+          "matchArtifact": {
+            "artifactAccount": "embedded-artifact",
+            "customKind": false,
+            "id": "ef50798c-14bd-48b2-99ae-aaafd2af5cb8",
+            "name": "platform-health",
+            "type": "embedded/base64"
+          },
+          "useDefaultArtifact": false,
+          "usePriorArtifact": false
+        }
+      ],
+      "inputArtifacts": [
+        {
+          "account": "",
+          "id": "12bca5a4-683e-448f-9f6a-561f6cd265ed"
+        },
+        {
+          "account": "",
+          "id": "3d3073f7-4a9b-445f-810b-109e1831ca76"
+        }
+      ],
+      "name": "Create Branch Kube Manifests",
+      "namespace": "platform-health",
+      "outputName": "platform-health",
+      "overrides": {
+        "deployType": "normal",
+        "imageTag": "githubRequestTag"
+      },
+      "refId": "7",
+      "requisiteStageRefIds": [
+        "6"
+      ],
+      "stageEnabled": {
+        "expression": "${ parameters['Branch Name'] != 'master' }",
+        "type": "expression"
+      },
+      "templateRenderer": "HELM2",
+      "type": "bakeManifest"
+    },
+    {
+      "canceledStatuses": "CANCELLED",
+      "customHeaders": {
+        "Content-type": "application/json"
+      },
+      "method": "POST",
+      "name": "Build PR Image",
+      "payload": {
+        "commit_sha": "${ #stage('GitHub Request')['context']['webhook']['body']['commit_sha'] }",
+        "repo_name": "platform-health",
+        "type": "docker_image"
+      },
+      "refId": "8",
+      "requisiteStageRefIds": [
+        "6"
+      ],
+      "stageEnabled": {
+        "expression": "${ parameters['Branch Name'] != 'master' && parameters['Build Images'] == true }",
+        "type": "expression"
+      },
+      "statusJsonPath": "$.status",
+      "statusUrlJsonPath": "$.status_url",
+      "statusUrlResolution": "webhookResponse",
+      "successStatuses": "SUCCESS",
+      "terminalStatuses": "FAILURE,ERROR",
+      "type": "webhook",
+      "url": "http://pipeline-commander-service.pipeline-commander.svc.cluster.local/google_builds",
+      "waitForCompletion": true
+    },
+    {
+      "application": "vault-key",
+      "failPipeline": true,
+      "name": "Run vault-sync",
+      "pipeline": "2676dae1-edba-4939-8a76-7911d17b58f8",
+      "pipelineParameters": {
+        "Namespace": "platform-health",
+        "Secret Path": "poc/applications/data/platform-health/dotenv",
+        "Vault Role": "k8s-secret-sync"
+      },
+      "refId": "9",
+      "requisiteStageRefIds": [
+        "5",
+        "7",
+        "8"
+      ],
+      "type": "pipeline",
+      "waitForCompletion": true
+    },
+    {
+      "account": "gke-pocs",
+      "cloudProvider": "kubernetes",
+      "manifestArtifactId": "38709b41-0ce9-4f98-a913-a2eeb32c20ac",
+      "moniker": {
+        "app": "platform-health"
+      },
+      "name": "Branch Deploy Manifests",
+      "namespaceOverride": "",
+      "refId": "10",
+      "requisiteStageRefIds": [
+        "9"
+      ],
+      "skipExpressionEvaluation": false,
+      "source": "artifact",
+      "stageEnabled": {
+        "expression": "${ parameters['Branch Name'] != 'master' }",
+        "type": "expression"
+      },
+      "trafficManagement": {
+        "enabled": false,
+        "options": {
+          "enableTraffic": false,
+          "services": []
+        }
+      },
+      "type": "deployManifest"
+    },
+    {
+      "account": "gke-pocs",
+      "cloudProvider": "kubernetes",
+      "manifestArtifactId": "88a0995c-10f0-4560-b8ab-53df45b1e394",
+      "moniker": {
+        "app": "platform-health"
+      },
+      "name": "Master Deploy Manifests",
+      "refId": "11",
+      "requisiteStageRefIds": [
+        "9"
+      ],
+      "skipExpressionEvaluation": false,
+      "source": "artifact",
+      "stageEnabled": {
+        "expression": "${ parameters['Branch Name'] == 'master' }",
+        "type": "expression"
+      },
+      "trafficManagement": {
+        "enabled": false,
+        "options": {
+          "enableTraffic": false,
+          "services": []
+        }
+      },
+      "type": "deployManifest"
+    },
+    {
+      "completeOtherBranchesThenFail": false,
+      "continuePipeline": true,
+      "failPipeline": false,
+      "method": "POST",
+      "name": "Create DataDog Event",
+      "payload": {
+        "alert_type": "info",
+        "source_type_name": "Kubernetes",
+        "tags": [
+          "deploy",
+          "release:${ parameters['Branch Name'] }",
+          "platform-health",
+          "app:platform-health",
+          "namespace:platform-health",
+          {
+            "owner": "infra"
+          },
+          "poc",
+          "env:poc",
+          "cluster-name:gke-spinnaker-poc"
+        ],
+        "title": "platform-health deployment to gke-spinnaker-poc"
+      },
+      "refId": "12",
+      "requisiteStageRefIds": [
+        "10",
+        "11"
+      ],
+      "statusUrlResolution": "getMethod",
+      "type": "webhook",
+      "url": "https://app.datadoghq.com/api/v1/events?api_key=c2e67b2e51abbff730e359a4e72686ad"
+    }
+  ],
+  "triggers": [],
+  "updateTs": "1596763487619"
+}

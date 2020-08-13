@@ -1,0 +1,12 @@
+apiVersion: spinnaker.armory.io/v1alpha2
+kind: SpinnakerService
+metadata:
+  name: spinnaker
+spec:
+  spinnakerConfig:
+    config:
+      notifications:
+        slack:
+          enabled: true
+          botName: spinnaker
+          token: encrypted:k8s!n:ts-poc-secrets!k:poc-spinnaker-slack

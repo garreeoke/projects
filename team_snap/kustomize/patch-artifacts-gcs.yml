@@ -1,0 +1,13 @@
+apiVersion: spinnaker.armory.io/v1alpha2
+kind: SpinnakerService
+metadata:
+  name: spinnaker
+spec:
+  spinnakerConfig:
+    config:
+      artifacts:
+        gcs:
+          enabled: true
+          accounts:
+          - name: poc-gcs-service-account
+            jsonPath: encryptedFile:k8s!n:ts-poc-secrets!k:google-cloud-sa
