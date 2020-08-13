@@ -6,7 +6,7 @@
   "pipelines": [
     {
         "application": "platform-health",
-        "name": "test-poc-pipeline-pas",
+        "name": "test-poc-pipeline-dinghy",
         "description": "Deploy Platform Health Application",
         	"keepWaitingPipelines": true,
         	"limitConcurrent": true,
