@@ -1,8 +1,5 @@
 {
   "application": "platform-health",
-  "globals": {
-
-  },
   "pipelines": [
     {
         "application": "platform-health",
@@ -72,7 +69,7 @@
         			},
         			"expectedArtifacts": [
                         {{ module "gcs.expectedart.module" "gcsAccount" "poc-gcs-service-account" "expectedArtifactId" "platform-health-branch-helm-chart" "displayName" "Branch Helm Chart" "artifactName" "helm-chart" }},
-                        {{ module "github.expectedart.module" "expectedArtifactId" "platform-health-branch-helm-values" "displayName" "Branch Helm Values" "artifactPath" "infra/helm/values/poc-values.yaml" "reference" "https://api.github.com/repos/teamsnap/platform-health/contents/infra/helm/values/poc-values.yaml" "version" "test" }}
+                        {{ module "github.expectedart.module" "expectedArtifactId" "platform-health-branch-helm-values" "displayName" "Branch Helm Values" "artifactPath" "infra/helm/values/poc-values.yaml" "reference" "https://api.github.com/repos/teamsnap/platform-health/contents/infra/helm/values/poc-values.yaml" "version" "${parameters['Branch Name']}" }}
                     ],
         			"method": "POST",
         			"name": "GitHub Request",
@@ -237,7 +234,8 @@
         				"useDefaultArtifact": false,
         				"usePriorArtifact": false
         			}],
-        			"inputArtifacts": [{
+        			"inputArtifacts": [
+        			    {
         					"account": "",
         					"id": "platform-health-branch-helm-chart"
         				},
