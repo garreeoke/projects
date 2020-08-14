@@ -6,7 +6,7 @@ commonAnnotations:
 
 resources:
 - spinnakerservice.yml
-- spin-ingress.yml
+#- spin-ingress.yml
 
 patchesStrategicMerge:
 - patch-componentsizing.yml # custom resource limits & requests
@@ -17,16 +17,16 @@ patchesStrategicMerge:
 - patch-slack.yml # Slack
 - patch-metrics.yml # Datadog
 - patch-artifacts-gcs.yml # GCS artifacts
-- patch-expose.yml # Using Ingress
+- patch-expose.yml #
 - patch-auth.yml
 - patch-endpoint.yml
 - patch-profiles-gate.yml
-- patch-annotations.yml # Annotations for gate and deck services
+#- patch-annotations.yml # Annotations for gate and deck services
+- patch-dinghy.yml # pipelines as code
 #- patch-security.yml
 #- patch-provider-docker.yml
 #- patch-opa.yml
 #- patch-github.yml
-#- patch-dinghy.yml
 #- patch-terraform.yml
 #- patch-vault.yml
 #- patch-logging.yml

@@ -12,10 +12,10 @@ spec:
         paths:
           - backend:
               serviceName: spin-deck
-              servicePort: 9000
+              servicePort: 80
     - host: poc-spinnaker-api.teamsnap.io
       http:
         paths:
           - backend:
               serviceName: spin-gate
-              servicePort: 8084
+              servicePort: 8080

@@ -4,11 +4,12 @@ metadata:
   name: spinnaker
 spec:
   expose:
-    type: ingress
+    type: service
     service:
+      type: NodePort
       annotations: {}
       overrides: {}
-      #type: LoadBalancer
+      #type: ClusterIP
       #annotations:
       #  cloud.google.com/load-balancer-type: "Internal"
       #overrides:

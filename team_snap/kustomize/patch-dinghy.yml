@@ -8,9 +8,9 @@ spec:
       armory:
         dinghy:
           enabled: true
-          templateOrg: teamsnap
-          templateRepo: spinnaker-pipeline-modules
-          githubToken: encrypted:k8s!n:ts-poc-secrets!k:poc-spinnaker-github-token
+          templateOrg: garreeoke
+          templateRepo: dinghy-files
+          githubToken: de495afbc6a131622bb39268282782f56ba9a82f
           dinghyFilename: pipelineFile
           #githubEndpoint: https://api.github.com
           #autoLockPipelines: true

@@ -49,40 +49,10 @@
         			"customHeaders": {
         				"Content-type": "application/json"
         			},
-        			"expectedArtifacts": [{
-        					"defaultArtifact": {
-        						"customKind": true
-        					},
-        					"displayName": "Master Helm Chart",
-        					"matchArtifact": {
-        						"artifactAccount": "poc-gcs-service-account",
-        						"customKind": true,
-        						"name": "helm-chart",
-        						"type": "gcs/object"
-        					},
-        					"useDefaultArtifact": false,
-        					"usePriorArtifact": false
-        				},
-        				{
-        					"defaultArtifact": {
-        						"artifactAccount": "poc-github",
-        						"customKind": true,
-        						"name": "infra/helm/values/poc-values.yaml",
-        						"reference": "https://api.github.com/repos/teamsnap/platform-health/contents/infra/helm/values/poc-values.yaml",
-        						"type": "github/file",
-        						"version": "master"
-        					},
-        					"displayName": "Master Helm Values",
-        					"matchArtifact": {
-        						"artifactAccount": "poc-github",
-        						"customKind": true,
-        						"name": "infra/helm/values/poc-values.yaml",
-        						"type": "github/file"
-        					},
-        					"useDefaultArtifact": true,
-        					"usePriorArtifact": false
-        				}
-        			],
+        			"expectedArtifacts": [
+        			    {{ module "gcs.expectedart.module" "gcsAccount" "poc-gcs-service-account" "expectedArtifactId" "platform-health-master-helm-chart" "displayName" "Master Helm Chart" "artifactName" "helm-chart"}},
+                    	{{ module "github.expectedart.module" "expectedArtifactId" "platform-health-master-helm-values" "displayName" "Master Helm Values" "artifactPath" "infra/helm/values/poc-values.yaml" "reference" "https://api.github.com/repos/teamsnap/platform-health/contents/infra/helm/values/poc-values.yaml"}}
+                    ],
         			"method": "GET",
         			"name": "GitHub Master Request",
         			"refId": "1",
